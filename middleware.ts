@@ -12,7 +12,7 @@ export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // Public paths that don't require authentication
-  const publicPaths = ["/", "/login", "/register"];
+  const publicPaths = ["/login", "/register"];
   const isPublicPath = publicPaths.includes(pathname);
 
   console.log("Trying access to", pathname, "isAuthenticated", isAuthenticated);
