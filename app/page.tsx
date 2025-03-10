@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { MenuHeader } from "@/components/home/menu-header";
 import { CategoryNav } from "@/components/home/category-nav";
@@ -6,8 +6,30 @@ import { MenuSection } from "@/components/home/menu-section";
 import { CompleteOrderButton } from "@/components/home/complete-order-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { HotDrinksDummyData, menuItems } from "@/constants";
+import { IProduct } from "@/types";
+import { headers } from "next/headers";
+import { formatCategoryId } from "@/lib/utils";
 
-export default function HomePage() {
+export default async function HomePage() {
+  let products: { title: string; items: IProduct[] }[] = [];
+
+  try {
+    const host = (await headers()).get("host");
+    const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+    console.log(
+      "Fetching...",
+      `${protocol}://${host}/api/products?section-format=true`
+    );
+    const res = await fetch(
+      `${protocol}://${host}/api/products?section-format=true`
+    );
+
+    if (!res.ok) throw new Error("Failed to fetch products");
+    products = await res.json();
+  } catch (error) {
+    console.error("Error loading products:", error);
+  }
+
   return (
     <div className="flex min-h-screen flex-col dark:bg-black">
       <MenuHeader />
@@ -24,18 +46,19 @@ export default function HomePage() {
             />
           </div>
 
-          <h1 className="sr-only">Triple Coffee & Juicery</h1>
+          <h1 className="sr-only">Hatly menu</h1>
         </div>
 
-        <CategoryNav />
+        <CategoryNav categories={products?.map((prod) => prod.title) || []} />
 
         <div className="container mx-auto px-4 py-8">
           <Suspense fallback={<CategorySkeleton />}>
-            {menuItems.map((ele, ix) => (
+            {products?.map((ele, ix) => (
               <MenuSection
-                id={ele.name.toLowerCase().replace(/\s/g, "-")}
-                title={ele.name}
-                items={HotDrinksDummyData}
+                key={ix}
+                id={formatCategoryId(ele.title)}
+                title={ele.title}
+                items={ele.items}
               />
             ))}
           </Suspense>
@@ -63,106 +86,3 @@ function CategorySkeleton() {
     </div>
   );
 }
-
-const hotDrinks = [
-  {
-    id: "1",
-    name: "Turkish Coffee",
-    description: "Rich and authentic Turkish coffee with cardamom",
-    price: 12,
-    image:
-      "https://storage.6lb.menu/Menus/Triple_coffee/Items/182917/ItemBigImage_v1.jpg",
-    category: "Hot Drinks",
-    tags: ["Signature", "Popular"],
-    rating: 5,
-  },
-  {
-    id: "1a",
-    name: "Espresso",
-    description: "Strong Italian coffee served in a small cup",
-    price: 10,
-    image:
-      "https://storage.6lb.menu/Menus/Triple_coffee/Items/182922/ItemBigImage_v1.jpg",
-    category: "Hot Drinks",
-    tags: ["Classic"],
-    rating: 4,
-  },
-  {
-    id: "1b",
-    name: "Cappuccino",
-    description: "Espresso with steamed milk and foam",
-    price: 14,
-    image: "/placeholder.svg?height=400&width=400",
-    category: "Hot Drinks",
-    tags: ["Bestseller"],
-    rating: 5,
-  },
-];
-
-const coldDrinks = [
-  {
-    id: "2",
-    name: "Iced Latte",
-    description: "Smooth espresso with cold milk and ice",
-    price: 15,
-    image: "/placeholder.svg?height=400&width=400",
-    category: "Cold Drinks",
-    tags: ["Refreshing"],
-    rating: 4,
-  },
-  {
-    id: "2a",
-    name: "Fruit Smoothie",
-    description: "Blend of fresh seasonal fruits with yogurt",
-    price: 18,
-    image: "/placeholder.svg?height=400&width=400",
-    category: "Cold Drinks",
-    tags: ["Healthy", "New"],
-    rating: 5,
-  },
-  {
-    id: "2b",
-    name: "Iced Mocha",
-    description: "Espresso with chocolate, milk and ice",
-    price: 16,
-    image: "/placeholder.svg?height=400&width=400",
-    category: "Cold Drinks",
-    tags: ["Popular"],
-    rating: 4,
-  },
-];
-
-const sandwiches = [
-  {
-    id: "3",
-    name: "Club Sandwich",
-    description:
-      "Triple-decker sandwich with chicken, bacon, and fresh vegetables",
-    price: 25,
-    image: "/placeholder.svg?height=400&width=400",
-    category: "Sandwiches",
-    tags: ["Bestseller"],
-    rating: 5,
-  },
-  {
-    id: "3a",
-    name: "Avocado Toast",
-    description:
-      "Sourdough bread with smashed avocado, cherry tomatoes and feta",
-    price: 22,
-    image: "/placeholder.svg?height=400&width=400",
-    category: "Sandwiches",
-    tags: ["Vegetarian", "Healthy"],
-    rating: 4,
-  },
-  {
-    id: "3b",
-    name: "Halloumi Wrap",
-    description: "Grilled halloumi cheese with fresh vegetables in a wrap",
-    price: 20,
-    image: "/placeholder.svg?height=400&width=400",
-    category: "Sandwiches",
-    tags: ["Vegetarian"],
-    rating: 4,
-  },
-];

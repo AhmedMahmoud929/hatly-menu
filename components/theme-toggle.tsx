@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 export function ThemeToggle({
   variant = "ghost",
@@ -19,12 +20,16 @@ export function ThemeToggle({
   variant?: "outline" | "ghost";
   className?: string;
 }) {
+  const pathname = usePathname();
   const { setTheme } = useTheme();
   const [dark, setDark] = useState(false);
 
   return (
     <Button
-      onClick={() => setDark(!dark)}
+      onClick={() => {
+        setDark(!dark);
+        setTheme(dark ? "light" : "dark");
+      }}
       variant={variant}
       size="icon"
       className={className}

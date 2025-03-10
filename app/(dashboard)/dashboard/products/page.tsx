@@ -325,6 +325,7 @@ export default function ProductsPage() {
                                 </Button>
                                 <Button
                                   variant="destructive"
+                                  disabled={!currentProduct}
                                   onClick={handleDeleteProduct}
                                 >
                                   Delete Product

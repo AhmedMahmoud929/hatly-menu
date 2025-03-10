@@ -19,7 +19,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const user = getUserFromToken(request)
+    const user = getUserFromToken()
 
     if (!user) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 })

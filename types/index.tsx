@@ -1,3 +1,15 @@
+// Add these interfaces to your existing types.ts file
+
+export interface ProductSize {
+  name: string;
+  price: number;
+}
+
+export interface ProductExtra {
+  name: string;
+  price: number;
+}
+
 export interface IProduct {
   _id: string;
   name: string;
@@ -6,9 +18,10 @@ export interface IProduct {
   rating: number;
   price: number;
   is_available: boolean;
-  total_order: number;
-  extras: string[];
+  total_order?: number;
+  extras: ProductExtra[];
   image: string;
+  sizes: ProductSize[];
 }
 
 export interface MenuItem {

@@ -3,8 +3,9 @@
 import { useRef, useEffect, useState } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { menuItems } from "@/constants";
+import { formatCategoryId } from "@/lib/utils";
 
-export function CategoryNav() {
+export function CategoryNav({ categories }: { categories: string[] }) {
   const [isSticky, setIsSticky] = useState(false);
   const [activeCategory, setActiveCategory] = useState("hot-drinks");
   const categoryRef = useRef<HTMLDivElement>(null);
@@ -41,8 +42,8 @@ export function CategoryNav() {
       }
 
       // Update active category based on scroll position
-      const sections = menuItems.map((cat) =>
-        document.getElementById(cat.name.toLowerCase().replace(/\s/g, "-"))
+      const sections = categories.map((cat) =>
+        document.getElementById(formatCategoryId(cat))
       );
       const scrollPosition = window.scrollY + 150; // Offset for header
 
@@ -53,9 +54,7 @@ export function CategoryNav() {
         const sectionBottom = sectionTop + section.offsetHeight;
 
         if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
-          setActiveCategory(
-            menuItems[index].name.toLowerCase().replace(/\s/g, "-")
-          );
+          setActiveCategory(formatCategoryId(categories[index]));
         }
       });
     };
@@ -91,20 +90,17 @@ export function CategoryNav() {
     >
       <ScrollArea className="w-full sm:container whitespace-nowrap">
         <div className="flex w-max space-x-2 p-3">
-          {menuItems.map((category) => (
+          {categories.map((category) => (
             <button
-              key={category.name.toLowerCase().replace(/\s/g, "-")}
-              onClick={() =>
-                scrollToSection(category.name.toLowerCase().replace(/\s/g, "-"))
-              }
+              key={formatCategoryId(category)}
+              onClick={() => scrollToSection(formatCategoryId(category))}
               className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                activeCategory ===
-                category.name.toLowerCase().replace(/\s/g, "-")
+                activeCategory === formatCategoryId(category)
                   ? "dark:bg-white text-primary-foreground"
                   : "dark:bg-[#2c2c2c] hover:bg-muted/80"
               }`}
             >
-              {category.name}
+              {category}
             </button>
           ))}
         </div>
