@@ -21,13 +21,6 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    // Check authentication
-    const user = await getUserFromToken();
-
-    if (!user) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-    }
-
     await dbConnect();
 
     const { customerName, tableNumber, totalPrice, products } =

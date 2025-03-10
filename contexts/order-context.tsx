@@ -162,6 +162,8 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       })),
     };
 
+    console.log(preparedOrder);
+
     fetch("/api/orders", {
       method: "POST",
       body: JSON.stringify(preparedOrder),
