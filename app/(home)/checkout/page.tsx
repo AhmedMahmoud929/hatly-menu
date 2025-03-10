@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { ArrowLeft, Minus, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Loader, Minus, Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,8 +13,13 @@ import { useOrder } from "@/contexts/order-context";
 
 export default function OrderPage() {
   const router = useRouter();
-  const { order, updateItemQuantity, removeItemFromOrder, placeOrder } =
-    useOrder();
+  const {
+    order,
+    updateItemQuantity,
+    removeItemFromOrder,
+    placeOrder,
+    isSubmittingOrder,
+  } = useOrder();
 
   const [name, setName] = useState("");
   const [tableNumber, setTableNumber] = useState("");
@@ -26,7 +31,7 @@ export default function OrderPage() {
   };
 
   const calculateTax = () => {
-    return calculateSubtotal() * 0.1; // 10% tax
+    return 2.5;
   };
 
   if (!order || order.items.length === 0) {
@@ -242,10 +247,25 @@ export default function OrderPage() {
               <Button
                 className="w-full"
                 size="lg"
-                onClick={() => placeOrder(name, tableNumber)}
-                disabled={!name || !tableNumber || order.items.length === 0}
+                onClick={() =>
+                  placeOrder(
+                    name,
+                    tableNumber,
+                    calculateSubtotal() + calculateTax()
+                  )
+                }
+                disabled={
+                  !name ||
+                  !tableNumber ||
+                  order.items.length === 0 ||
+                  isSubmittingOrder
+                }
               >
-                Place Order
+                {isSubmittingOrder ? (
+                  <Loader className="animate-spin" />
+                ) : (
+                  "Place Order"
+                )}
               </Button>
             </div>
           </div>

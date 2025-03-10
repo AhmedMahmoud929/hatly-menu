@@ -26,6 +26,7 @@ export default async function HomePage() {
 
     if (!res.ok) throw new Error("Failed to fetch products");
     products = await res.json();
+    console.log(products);
   } catch (error) {
     console.error("Error loading products:", error);
   }

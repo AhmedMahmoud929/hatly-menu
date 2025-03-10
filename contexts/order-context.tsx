@@ -1,7 +1,9 @@
 "use client";
 
+import { useToast } from "@/hooks/use-toast";
 import type React from "react";
 import { useState, createContext, useContext, useMemo, useEffect } from "react";
+import { toast } from "sonner";
 
 export interface IOrderItem {
   _id: string;
@@ -22,12 +24,17 @@ export interface IOrder {
 interface OrderContextType {
   order: IOrder | null;
   totalOrderPrice: number;
+  isSubmittingOrder: boolean;
   setOrder: (order: IOrder | null) => void;
   addProductToOrder: (product: IOrderItem) => void;
   updateItemQuantity: (itemId: string, change: number) => void;
   removeItemFromOrder: (itemId: string) => void;
   clearOrder: () => void;
-  placeOrder: (customerName: string, tableNumber: string) => void;
+  placeOrder: (
+    customerName: string,
+    tableNumber: string,
+    totalPrice: number
+  ) => void;
 }
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
@@ -36,6 +43,8 @@ const STORAGE_KEY = "restaurant_order";
 
 export function OrderProvider({ children }: { children: React.ReactNode }) {
   const [order, setOrderState] = useState<IOrder | null>(null);
+  const [isSubmittingOrder, setIsSubmittingOrder] = useState<boolean>(false);
+  const { toast } = useToast();
 
   const totalOrderPrice: number = useMemo(
     () => order?.items.reduce((acc, item) => acc + item.totalPrice, 0) || 0,
@@ -133,11 +142,50 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     setOrder(null);
   };
 
-  const placeOrder = (customerName: string, tableNumber: string) => {
-    console.log({ customerName, tableNumber, order });
-    // alert(
-    //   `Order placed! Thank you, ${customerName}. Your food will be delivered to table ${tableNumber}.`
-    // );
+  const placeOrder = (
+    customerName: string,
+    tableNumber: string,
+    totalPrice: number
+  ) => {
+    setIsSubmittingOrder(true);
+    const preparedOrder = {
+      customerName,
+      tableNumber,
+      totalPrice,
+      products: order?.items.map((ele) => ({
+        _id: ele._id.split("_")[0],
+        name: ele.name,
+        quantity: ele.quantity,
+        size: ele.size,
+        pricePerItem: ele.pricePerItem,
+        extras: ele.extras,
+      })),
+    };
+
+    fetch("/api/orders", {
+      method: "POST",
+      body: JSON.stringify(preparedOrder),
+    })
+      .then((res) => {
+        if (res.ok) {
+          clearOrder();
+          alert(
+            `Order placed! Thank you, ${name}. Your order will be delivered to table ${tableNumber}.`
+          );
+          toast({
+            title: "Order placed successfully",
+            variant: "success",
+          });
+        }
+      })
+      .catch((err) =>
+        toast({
+          title: "Something went wrong",
+          variant: "destructive",
+          description: err.message,
+        })
+      )
+      .finally(() => setIsSubmittingOrder(false));
   };
 
   useEffect(() => {
@@ -157,6 +205,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       value={{
         order,
         totalOrderPrice,
+        isSubmittingOrder,
         setOrder,
         addProductToOrder,
         updateItemQuantity,
