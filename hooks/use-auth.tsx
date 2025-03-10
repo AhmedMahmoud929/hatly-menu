@@ -30,7 +30,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { toast } = useToast();
   const pathname = usePathname();
-  const isPublic = ["/", "/login", "/register"].includes(pathname);
+  const isPublic = ["/", "/checkout", "/login", "/register"].includes(pathname);
 
   useEffect(() => {
     getUserFromToken()
