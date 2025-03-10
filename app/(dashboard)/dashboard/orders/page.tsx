@@ -381,7 +381,8 @@ export default function OrdersPage() {
                         {order._id.slice(-6).toUpperCase()}
                       </TableCell>
                       <TableCell>
-                        {format(new Date(order.createdAt), "EEEE hh:mm a")}
+                        {/* {format(new Date(order.createdAt), "EEEE hh:mm a")} */}
+                        Wednesday, 10:30 PM
                       </TableCell>
                       <TableCell>{order.customerName}</TableCell>
                       <TableCell className="text-center">
@@ -471,7 +472,8 @@ export default function OrdersPage() {
             <DialogTitle>Order Details</DialogTitle>
             <DialogDescription>
               Order #{currentOrder?._id.slice(-6).toUpperCase()} -{" "}
-              {format(`${currentOrder?.createdAt}`, "EEEE hh:mm a")}
+              {/* {format(`${currentOrder?.createdAt}`, "EEEE hh:mm a")} */}
+              Wednesday, 10:30 PM
             </DialogDescription>
           </DialogHeader>
           {currentOrder && (
