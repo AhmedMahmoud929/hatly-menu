@@ -172,7 +172,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
         if (res.ok) {
           clearOrder();
           alert(
-            `Order placed! Thank you, ${name}. Your order will be delivered to table ${tableNumber}.`
+            `Order placed! Thank you, ${customerName}. Your order will be delivered to table ${tableNumber}.`
           );
           toast({
             title: "Order placed successfully",
