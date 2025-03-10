@@ -5,6 +5,12 @@ import { getUserFromToken } from "@/lib/auth-utils";
 
 export async function GET() {
   try {
+    // Check authentication
+    const user = await getUserFromToken();
+
+    if (!user)
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+
     await dbConnect();
 
     const orders = await Order.find({}).sort({ createdAt: -1 });

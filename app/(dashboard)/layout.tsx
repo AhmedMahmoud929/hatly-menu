@@ -40,7 +40,7 @@ export default function DashboardLayout({
     },
     {
       href: "/dashboard/orders",
-      label: "Orders (coming soon)",
+      label: "Orders",
       icon: ClipboardList,
       active: pathname === "/dashboard/orders",
     },
@@ -106,10 +106,6 @@ export default function DashboardLayout({
                     href={route.href}
                     onClick={() => setIsMobileNavOpen(false)}
                     className={`
-                      ${
-                        route.href === "/dashboard/orders" &&
-                        "opacity-50 pointer-events-none"
-                      }
                       flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
                         route.active
                           ? "bg-primary text-primary-foreground"
@@ -159,10 +155,6 @@ export default function DashboardLayout({
                 key={route.href}
                 href={route.href}
                 className={`
-                  ${
-                    route.href === "/dashboard/orders" &&
-                    "opacity-50 pointer-events-none"
-                  }
                   flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
                     route.active
                       ? "bg-primary text-primary-foreground"
