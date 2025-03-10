@@ -3,11 +3,15 @@
 import { useState, useEffect } from "react";
 import { ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useOrder } from "@/contexts/order-context";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export function CompleteOrderButton() {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
-
+  const { totalOrderPrice } = useOrder();
+  const router = useRouter();
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
@@ -35,9 +39,18 @@ export function CompleteOrderButton() {
         <Button
           className="w-full bg-orange-600 hover:bg-orange-700 text-white"
           size="lg"
+          onClick={() => totalOrderPrice && router.push("/checkout")}
         >
           <ShoppingBag className="h-7 w-7" />
-          Complete Order (0 QR)
+          Complete Order (
+          <Image
+            src="/ksa-currency.svg"
+            className="brightness-0 invert -mx-1"
+            alt="coin"
+            width={16}
+            height={16}
+          />
+          {totalOrderPrice} )
         </Button>
       </div>
     </div>

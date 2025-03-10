@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { IProduct, MenuItem } from "@/types";
+import { useOrder } from "@/contexts/order-context";
 
 interface ProductBottomSheetProps {
   item: IProduct;
@@ -29,6 +30,7 @@ export function ProductBottomSheet({
   const [activeSizeIx, setActiveSizeIx] = useState(0);
   const [extras, setExtras] = useState<string[]>([]);
   const [specialInstructions, setSpecialInstructions] = useState("");
+  const { addProductToOrder } = useOrder();
 
   const handleQuantityChange = (value: number) => {
     if (quantity + value > 0) {
@@ -59,18 +61,20 @@ export function ProductBottomSheet({
   };
 
   const handleAddToOrder = () => {
-    // Here you would add the item to the cart/order
-    // For now, we'll just close the sheet
-    const order = {
-      product: item._id,
+    const orderedProduct = {
+      _id: item._id,
+      name: item.name,
       quantity,
       size: item.sizes[activeSizeIx].name,
       extras,
       specialInstructions,
-      total: calculateTotalPrice(),
+      image: item.image,
+      pricePerItem: item.sizes[activeSizeIx].price,
+      totalPrice: calculateTotalPrice(),
     };
-    console.log(order);
-    // onClose();
+
+    addProductToOrder(orderedProduct);
+    onClose();
   };
 
   return (

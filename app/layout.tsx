@@ -22,15 +22,17 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <AuthProvider>
-          <ThemeProvider
-            attribute="class"
-            forcedTheme="dark"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-            <Toaster />
-          </ThemeProvider>
+          <OrderProvider>
+            <ThemeProvider
+              attribute="class"
+              forcedTheme="dark"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+              <Toaster />
+            </ThemeProvider>
+          </OrderProvider>
         </AuthProvider>
       </body>
     </html>
@@ -38,3 +40,4 @@ export default function RootLayout({
 }
 
 import "./globals.css";
+import { OrderProvider } from "@/contexts/order-context";
