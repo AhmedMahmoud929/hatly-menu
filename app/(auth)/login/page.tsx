@@ -1,37 +1,44 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import { Utensils } from "lucide-react"
+import { useState } from "react";
+import Link from "next/link";
+import { Utensils } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { useAuth } from "@/hooks/use-auth"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function LoginPage() {
-  const { login, loading } = useAuth()
+  const { login, loading } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-  })
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      await login(formData.email, formData.password)
+      await login(formData.email, formData.password);
     } catch (error) {
       // Error is handled in the useAuth hook
     }
-  }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/40 px-4">
@@ -42,8 +49,10 @@ export default function LoginPage() {
               <Utensils className="h-6 w-6" />
             </div>
           </div>
-          <CardTitle className="text-2xl">Restaurant Dashboard</CardTitle>
-          <CardDescription>Enter your credentials to access the dashboard</CardDescription>
+          <CardTitle className="text-2xl">Hatly Dashboard</CardTitle>
+          <CardDescription>
+            Enter your credentials to access the dashboard
+          </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
@@ -62,7 +71,10 @@ export default function LoginPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <Link href="#" className="text-sm text-primary underline-offset-4 hover:underline">
+                <Link
+                  href="#"
+                  className="text-sm text-primary underline-offset-4 hover:underline"
+                >
                   Forgot password?
                 </Link>
               </div>
@@ -83,7 +95,10 @@ export default function LoginPage() {
             </Button>
             <p className="text-center text-sm text-muted-foreground">
               Don't have an account?{" "}
-              <Link href="/register" className="text-primary underline-offset-4 hover:underline">
+              <Link
+                href="/register"
+                className="text-primary underline-offset-4 hover:underline"
+              >
                 Register
               </Link>
             </p>
@@ -91,6 +106,5 @@ export default function LoginPage() {
         </form>
       </Card>
     </div>
-  )
+  );
 }
-

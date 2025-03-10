@@ -1,35 +1,42 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import { Utensils } from "lucide-react"
+import { useState } from "react";
+import Link from "next/link";
+import { Utensils } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { useAuth } from "@/hooks/use-auth"
-import { useToast } from "@/hooks/use-toast"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
 
 export default function RegisterPage() {
-  const { register, loading } = useAuth()
-  const { toast } = useToast()
+  const { register, loading } = useAuth();
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
-  })
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
 
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
@@ -37,16 +44,16 @@ export default function RegisterPage() {
         title: "Error",
         description: "Passwords do not match",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     try {
-      await register(formData.name, formData.email, formData.password)
+      await register(formData.name, formData.email, formData.password);
     } catch (error) {
       // Error is handled in the useAuth hook
     }
-  }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/40 px-4">
@@ -93,6 +100,7 @@ export default function RegisterPage() {
                 type="password"
                 value={formData.password}
                 onChange={handleChange}
+                placeholder="*********"
                 required
               />
             </div>
@@ -105,6 +113,7 @@ export default function RegisterPage() {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 required
+                placeholder="*********"
               />
             </div>
           </CardContent>
@@ -114,7 +123,10 @@ export default function RegisterPage() {
             </Button>
             <p className="text-center text-sm text-muted-foreground">
               Already have an account?{" "}
-              <Link href="/login" className="text-primary underline-offset-4 hover:underline">
+              <Link
+                href="/login"
+                className="text-primary underline-offset-4 hover:underline"
+              >
                 Sign in
               </Link>
             </p>
@@ -122,6 +134,5 @@ export default function RegisterPage() {
         </form>
       </Card>
     </div>
-  )
+  );
 }
-

@@ -40,7 +40,7 @@ export default function DashboardLayout({
     },
     {
       href: "/dashboard/orders",
-      label: "Orders",
+      label: "Orders (coming soon)",
       icon: ClipboardList,
       active: pathname === "/dashboard/orders",
     },
@@ -105,11 +105,16 @@ export default function DashboardLayout({
                     key={route.href}
                     href={route.href}
                     onClick={() => setIsMobileNavOpen(false)}
-                    className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
-                      route.active
-                        ? "bg-primary text-primary-foreground"
-                        : "hover:bg-muted"
-                    }`}
+                    className={`
+                      ${
+                        route.href === "/dashboard/orders" &&
+                        "opacity-50 pointer-events-none"
+                      }
+                      flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
+                        route.active
+                          ? "bg-primary text-primary-foreground"
+                          : "hover:bg-muted"
+                      }`}
                   >
                     <route.icon className="h-4 w-4" />
                     {route.label}
@@ -153,11 +158,16 @@ export default function DashboardLayout({
               <Link
                 key={route.href}
                 href={route.href}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
-                  route.active
-                    ? "bg-primary text-primary-foreground"
-                    : "hover:bg-muted"
-                }`}
+                className={`
+                  ${
+                    route.href === "/dashboard/orders" &&
+                    "opacity-50 pointer-events-none"
+                  }
+                  flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
+                    route.active
+                      ? "bg-primary text-primary-foreground"
+                      : "hover:bg-muted"
+                  }`}
               >
                 <route.icon className="h-4 w-4" />
                 {route.label}
