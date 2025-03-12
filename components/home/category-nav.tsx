@@ -4,12 +4,15 @@ import { useRef, useEffect, useState } from "react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { menuItems } from "@/constants";
 import { formatCategoryId } from "@/lib/utils";
+import { useLocale } from "next-intl";
+import { Locale } from "@/i18n/routing";
 
 export function CategoryNav({ categories }: { categories: string[] }) {
   const [isSticky, setIsSticky] = useState(false);
   const [activeCategory, setActiveCategory] = useState("hot-drinks");
   const categoryRef = useRef<HTMLDivElement>(null);
   const initialTopRef = useRef<number | null>(null);
+  const locale = useLocale() as Locale;
 
   useEffect(() => {
     const categoryElement = categoryRef.current;
@@ -84,11 +87,15 @@ export function CategoryNav({ categories }: { categories: string[] }) {
   return (
     <div
       ref={categoryRef}
+      dir={locale === "en" ? "ltr" : "rtl"}
       className={`w-full border-y dark:bg-[#151515] transition-all duration-300 ${
         isSticky ? "sticky top-16 z-40 shadow-md" : ""
       }`}
     >
-      <ScrollArea className="w-full sm:container whitespace-nowrap">
+      <ScrollArea
+        dir={locale === "en" ? "ltr" : "rtl"}
+        className="w-full sm:container whitespace-nowrap"
+      >
         <div className="flex w-max space-x-2 p-3">
           {categories.map((category) => (
             <button

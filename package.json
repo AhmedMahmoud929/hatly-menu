@@ -62,6 +62,7 @@
     "mongoose": "latest",
     "next": "15.1.0",
     "next-auth": "latest",
+    "next-intl": "^4.0.1",
     "next-themes": "latest",
     "nodemailer": "latest",
     "react": "^19",

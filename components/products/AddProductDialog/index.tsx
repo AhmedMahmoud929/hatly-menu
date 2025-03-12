@@ -26,12 +26,19 @@ import { Plus, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { ILocaleContent } from "@/models";
+import Image from "next/image";
 
 interface ICategory {
   _id: string;
-  name: string;
+  name: ILocaleContent;
   image: string;
 }
+
+type AddProductDTO = Omit<IProduct, "_id" | "name" | "description"> & {
+  name: ILocaleContent;
+  description: ILocaleContent;
+};
 
 function AddProductDialog({
   handleAddProductLocally,
@@ -53,10 +60,10 @@ function AddProductDialog({
     price: 0,
   });
 
-  const [newProduct, setNewProduct] = useState<Omit<IProduct, "_id">>({
-    name: "",
+  const [newProduct, setNewProduct] = useState<AddProductDTO>({
+    name: { en: "", ar: "" },
     category: "",
-    description: "",
+    description: { en: "", ar: "" },
     rating: 5,
     price: 0,
     is_available: true,
@@ -115,9 +122,9 @@ function AddProductDialog({
 
       // Reset form
       setNewProduct({
-        name: "",
+        name: { en: "", ar: "" },
         category: "",
-        description: "",
+        description: { en: "", ar: "" },
         rating: 5,
         price: 0,
         is_available: true,
@@ -195,9 +202,11 @@ function AddProductDialog({
 
   // When it's disabled
   const disabledCondition =
-    newProduct.name.trim() === "" ||
+    newProduct.name.ar.trim() === "" ||
+    newProduct.name.en.trim() === "" ||
     newProduct.category.trim() === "" ||
-    newProduct.description.trim() === "" ||
+    newProduct.description.ar.trim() === "" ||
+    newProduct.description.en.trim() === "" ||
     newProduct.image.trim() === "" ||
     sizes.some((size) => size.name.trim() === "" || size.price <= 0) ||
     extras.some((extra) => extra.name.trim() === "" || extra.price <= 0);
@@ -210,7 +219,7 @@ function AddProductDialog({
           Add Product
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto bg-[#0f0f0f]">
         <DialogHeader>
           <DialogTitle>Add New Product</DialogTitle>
           <DialogDescription>
@@ -218,63 +227,122 @@ function AddProductDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
+          {/* Name */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="grid gap-2">
+            <div>
               <Label htmlFor="name">Name</Label>
               <Input
                 id="name"
-                value={newProduct.name}
+                value={newProduct.name.en}
                 onChange={(e) =>
-                  setNewProduct({ ...newProduct, name: e.target.value })
+                  setNewProduct({
+                    ...newProduct,
+                    name: { en: e.target.value, ar: newProduct.name.ar },
+                  })
                 }
                 placeholder="Product name"
               />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="category">Category</Label>
-              <Select
-                value={newProduct.category}
-                onValueChange={(value) =>
-                  setNewProduct({ ...newProduct, category: value })
+            <div dir="rtl">
+              <Label htmlFor="name">الاسم</Label>
+              <Input
+                id="name"
+                value={newProduct.name.ar}
+                onChange={(e) =>
+                  setNewProduct({
+                    ...newProduct,
+                    name: { ar: e.target.value, en: newProduct.name.en },
+                  })
                 }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category._id} value={category.name}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                placeholder="اسم المنتج"
+              />
             </div>
           </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={newProduct.description}
-              onChange={(e) =>
-                setNewProduct({ ...newProduct, description: e.target.value })
+          {/* Category */}
+          <div>
+            <Label htmlFor="category">Category</Label>
+            <Select
+              value={newProduct.category}
+              onValueChange={(value) =>
+                setNewProduct({ ...newProduct, category: value })
               }
-              placeholder="Brief description"
-              rows={3}
-            />
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((category) => (
+                  <SelectItem key={category._id} value={category._id}>
+                    {category.name.en} - {category.name.ar}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
-          <div className="grid gap-2">
+          {/* Description */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={newProduct.description.en}
+                onChange={(e) =>
+                  setNewProduct({
+                    ...newProduct,
+                    description: {
+                      en: e.target.value,
+                      ar: newProduct.description.ar,
+                    },
+                  })
+                }
+                placeholder="Brief description"
+                rows={3}
+              />
+            </div>
+            <div dir="rtl">
+              <Label htmlFor="description">الوصف</Label>
+              <Textarea
+                id="description"
+                value={newProduct.description.ar}
+                onChange={(e) =>
+                  setNewProduct({
+                    ...newProduct,
+                    description: {
+                      ar: e.target.value,
+                      en: newProduct.description.en,
+                    },
+                  })
+                }
+                placeholder="وصف مختصر"
+                rows={3}
+              />
+            </div>
+          </div>
+
+          {/* Image */}
+          <div>
             <Label htmlFor="image">Image URL</Label>
-            <Input
-              id="image"
-              value={newProduct.image}
-              onChange={(e) =>
-                setNewProduct({ ...newProduct, image: e.target.value })
-              }
-              placeholder="https://example.com/image.jpg"
-            />
+            <div className="flex gap-2">
+              <Input
+                id="image"
+                value={newProduct.image}
+                onChange={(e) =>
+                  setNewProduct({ ...newProduct, image: e.target.value })
+                }
+                placeholder="https://example.com/image.jpg"
+              />
+              {newProduct.image && (
+                <Image
+                  src={newProduct.image}
+                  alt={`${newProduct.name.en} - ${newProduct.name.ar}`}
+                  width={40}
+                  height={40}
+                  className="rounded-lg"
+                />
+              )}
+            </div>
           </div>
 
           {/* Size Variations Section */}
@@ -404,7 +472,8 @@ function AddProductDialog({
             </CardContent>
           </Card>
 
-          <div className="grid grid-cols-2 gap-4">
+          {/* Rating & IsAvailable */}
+          <div className="grid grid-cols-2 gap-8">
             <div className="grid gap-2">
               <Label htmlFor="rating">Rating (0-5)</Label>
               <Input
@@ -423,17 +492,16 @@ function AddProductDialog({
                 placeholder="0.0"
               />
             </div>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="available"
-              checked={newProduct.is_available}
-              onCheckedChange={(checked) =>
-                setNewProduct({ ...newProduct, is_available: checked })
-              }
-            />
-            <Label htmlFor="available">Available</Label>
+            <div className="flex items-center space-x-2 mt-5">
+              <Switch
+                id="available"
+                checked={newProduct.is_available}
+                onCheckedChange={(checked) =>
+                  setNewProduct({ ...newProduct, is_available: checked })
+                }
+              />
+              <Label htmlFor="available">Available</Label>
+            </div>
           </div>
         </div>
         <DialogFooter>

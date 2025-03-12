@@ -1,0 +1,10 @@
+{
+    "Sidebar": {
+        "dashboard": "Dashboard",
+        "home": "Home",
+        "analytics": "Analytics",
+        "users": "Users",
+        "messages": "Messages",
+        "settings": "Settings"
+    }
+}

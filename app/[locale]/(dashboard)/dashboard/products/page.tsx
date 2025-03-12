@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { ArrowUpDown, Edit, Plus, Search, Trash, Star } from "lucide-react";
+import { ArrowUpDown, Search, Trash, Star } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -30,21 +30,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import AddProductDialog from "@/components/products/AddProductDialog";
 import { IProduct } from "@/types";
 import EditProductDialog from "@/components/products/EditProductDialog";
+import { useLocale } from "next-intl";
+import { Locale } from "@/i18n/routing";
 
 export default function ProductsPage() {
   const { toast } = useToast();
@@ -53,12 +45,17 @@ export default function ProductsPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<IProduct | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const locale = useLocale() as Locale;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Fetch products
-        const productsResponse = await fetch("/api/products");
+        const productsResponse = await fetch("/api/products", {
+          headers: {
+            "Accept-Language": locale,
+          },
+        });
         const productsData = await productsResponse.json();
         setProducts(productsData);
       } catch (error) {
@@ -264,7 +261,8 @@ export default function ProductsPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex justify-end">
-                          <EditProductDialog
+                          {/* FIXME: Make that dialog recieves the updated product */}
+                          {/* <EditProductDialog
                             currentProduct={currentProduct}
                             product={product}
                             setCurrentProduct={setCurrentProduct}
@@ -277,7 +275,7 @@ export default function ProductsPage() {
                                 )
                               )
                             }
-                          />
+                          /> */}
                           <Dialog
                             open={
                               isDeleteDialogOpen &&

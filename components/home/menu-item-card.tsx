@@ -2,12 +2,15 @@ import type { IProduct, MenuItem } from "@/types";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Star } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, getLocaleContent } from "@/lib/utils";
 import { ProductBottomSheet } from "./product-bottom-sheet";
 import { useState } from "react";
+import { useLocale } from "next-intl";
+import { Locale } from "@/i18n/routing";
 
 export default function MenuItemCard({ item }: { item: IProduct }) {
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+  const locale = useLocale() as Locale;
   return (
     <>
       <ProductBottomSheet

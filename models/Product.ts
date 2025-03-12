@@ -1,10 +1,11 @@
 import { ProductExtra, ProductSize } from "@/types";
 import mongoose, { Schema, type Document } from "mongoose";
+import { generateLocaleSchema, ILocaleContent } from ".";
 
 export interface IProduct extends Document {
-  name: string;
-  category: string;
-  description: string;
+  name: ILocaleContent;
+  category: mongoose.Types.ObjectId;
+  description: ILocaleContent;
   rating: number;
   price: number;
   is_available: boolean;
@@ -31,22 +32,18 @@ const nameWithSizeSchema = new Schema(
   { _id: false }
 );
 
-const ProductSchema: Schema = new Schema(
+const ProductSchema: Schema = new Schema<IProduct>(
   {
     name: {
-      type: String,
-      required: [true, "Please provide a product name"],
-      trim: true,
-    },
-    category: {
-      type: String,
-      required: [true, "Please provide a category"],
-      trim: true,
+      type: generateLocaleSchema("name", { trim: true }),
     },
     description: {
-      type: String,
-      required: [true, "Please provide a description"],
-      trim: true,
+      type: generateLocaleSchema("description", { trim: true }),
+    },
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      required: [true, "Please provide the category ID"],
     },
     rating: {
       type: Number,

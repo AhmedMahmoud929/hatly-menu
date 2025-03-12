@@ -1,5 +1,7 @@
 // Add these interfaces to your existing types.ts file
 
+import { ILocaleContent } from "@/models";
+
 export interface ProductSize {
   name: string;
   price: number;

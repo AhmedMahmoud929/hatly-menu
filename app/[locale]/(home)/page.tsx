@@ -9,8 +9,14 @@ import { HotDrinksDummyData, menuItems } from "@/constants";
 import { IProduct } from "@/types";
 import { headers } from "next/headers";
 import { formatCategoryId } from "@/lib/utils";
+import { Locale } from "@/i18n/routing";
 
-export default async function HomePage() {
+export default async function HomePage({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}) {
+  const { locale } = await params;
   let products: { title: string; items: IProduct[] }[] = [];
 
   try {
@@ -21,12 +27,16 @@ export default async function HomePage() {
       `${protocol}://${host}/api/products?section-format=true`
     );
     const res = await fetch(
-      `${protocol}://${host}/api/products?section-format=true`
+      `${protocol}://${host}/api/products?section-format=true`,
+      {
+        headers: {
+          "Accept-Language": locale || "en",
+        },
+      }
     );
 
     if (!res.ok) throw new Error("Failed to fetch products");
     products = await res.json();
-    console.log(products);
   } catch (error) {
     console.error("Error loading products:", error);
   }

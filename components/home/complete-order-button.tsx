@@ -6,12 +6,15 @@ import { Button } from "@/components/ui/button";
 import { useOrder } from "@/contexts/order-context";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
+import { Locale } from "@/i18n/routing";
 
 export function CompleteOrderButton() {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const { totalOrderPrice } = useOrder();
   const router = useRouter();
+  const locale = useLocale() as Locale;
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
@@ -42,7 +45,7 @@ export function CompleteOrderButton() {
           onClick={() => totalOrderPrice && router.push("/checkout")}
         >
           <ShoppingBag className="h-7 w-7" />
-          Complete Order (
+          {locale === "en" ? "Complete Order" : "تأكيد الطلب"} (
           <Image
             src="/ksa-currency.svg"
             className="brightness-0 invert -mx-1"

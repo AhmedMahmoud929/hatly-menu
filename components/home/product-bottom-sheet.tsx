@@ -14,6 +14,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { IProduct, MenuItem } from "@/types";
 import { useOrder } from "@/contexts/order-context";
+import { useLocale } from "next-intl";
+import { Locale } from "@/i18n/routing";
+import { getLocaleContent } from "@/lib/utils";
 
 interface ProductBottomSheetProps {
   item: IProduct;
@@ -31,6 +34,7 @@ export function ProductBottomSheet({
   const [extras, setExtras] = useState<string[]>([]);
   const [specialInstructions, setSpecialInstructions] = useState("");
   const { addProductToOrder } = useOrder();
+  const locale = useLocale() as Locale;
 
   const handleQuantityChange = (value: number) => {
     if (quantity + value > 0) {
@@ -128,7 +132,9 @@ export function ProductBottomSheet({
 
           <div className="space-y-6">
             <div>
-              <h3 className="mb-3 text-lg font-medium">Size</h3>
+              <h3 className="mb-3 text-lg font-medium">
+                {getLocaleContent(locale, "Size", "الحجم")}
+              </h3>
               <RadioGroup
                 value={activeSizeIx.toString()}
                 className="flex flex-wrap gap-3"
@@ -154,7 +160,9 @@ export function ProductBottomSheet({
 
             {item.extras.length !== 0 && (
               <div>
-                <h3 className="mb-3 text-lg font-medium">Extras</h3>
+                <h3 className="mb-3 text-lg font-medium">
+                  {getLocaleContent(locale, "Extras", "الإضافات")}
+                </h3>
                 <div className="space-y-3">
                   {item.extras.map((extra, ix) => (
                     <div
@@ -191,7 +199,13 @@ export function ProductBottomSheet({
             )}
 
             <div>
-              <h3 className="mb-3 text-lg font-medium">Special Instructions</h3>
+              <h3 className="mb-3 text-lg font-medium">
+                {getLocaleContent(
+                  locale,
+                  "Special Instructions",
+                  "تعليمات خاصة"
+                )}
+              </h3>
               <Textarea
                 placeholder="Add a note (e.g. less sugar, no ice)"
                 value={specialInstructions}
@@ -201,7 +215,9 @@ export function ProductBottomSheet({
             </div>
 
             <div>
-              <h3 className="mb-3 text-lg font-medium">Quantity</h3>
+              <h3 className="mb-3 text-lg font-medium">
+                {getLocaleContent(locale, "Quantity", "الكمية")}
+              </h3>
               <div className="flex items-center">
                 <Button
                   variant="outline"
@@ -226,13 +242,13 @@ export function ProductBottomSheet({
 
         <SheetFooter className="sticky bottom-0 gap-2 flex-row border-t bg-background p-4">
           <Button variant="outline" className="flex-1" onClick={onClose}>
-            Back
+            {getLocaleContent(locale, "Back", "الرجوع")}
           </Button>
           <Button
             className="flex-1 bg-destructive hover:bg-destructive/90 text-destructive-foreground"
             onClick={handleAddToOrder}
           >
-            <span>Total: </span>
+            <span>{getLocaleContent(locale, "Total:", "الكل:")}</span>
             <span className="flex gap-1 text-lg">
               <Image
                 src="/ksa-currency.svg"

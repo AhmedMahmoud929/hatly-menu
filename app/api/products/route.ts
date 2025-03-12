@@ -1,25 +1,46 @@
 import { type NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db-connect";
-import Product from "@/models/Product";
+import Product, { IProduct } from "@/models/Product";
 import { getUserFromToken } from "@/lib/auth-utils";
+import { Locale } from "@/i18n/routing";
+import { ILocaleContent } from "@/models";
 
 export async function GET(req: NextRequest) {
   try {
     await dbConnect();
-    // Access format query parameter
+    // Access query parameters
     const { searchParams } = new URL(req.url);
+    const acceptLanguage = req.headers.get("Accept-Language") as string;
+    const locale: Locale = ["en", "ar"].includes(acceptLanguage)
+      ? (acceptLanguage as Locale)
+      : "en";
+
     const isSectionFormat = ["true", "True", "1"].includes(
       searchParams.get("section-format")!
     );
 
-    const products = await Product.find({}).sort({ createdAt: -1 });
+    // Fetch products with populated category (only _id and name)
+    const products: (IProduct & {
+      category: { name: ILocaleContent };
+    })[] = await Product.find({})
+      .populate("category", "name")
+      .sort({ createdAt: -1 });
 
+    // Format each product for the correct locale
+    const formattedProducts = products.map((prod) => ({
+      ...prod.toJSON(),
+      name: prod.name[locale],
+      description: prod.description[locale],
+      category: prod.category.name[locale],
+    }));
+
+    // If section format is requested, group products by category name
     const finalProducts = !isSectionFormat
-      ? products
+      ? formattedProducts
       : Object.entries(
-          products.reduce((acc: Record<string, any[]>, product) => {
-            const category: string =
-              product.category.toLocaleLowerCase() || "Uncategorized";
+          formattedProducts.reduce((acc: Record<string, any[]>, product) => {
+            // Use lower case for consistency; fallback to "uncategorized"
+            const category = product.category.toLowerCase() || "uncategorized";
             if (!acc[category]) acc[category] = [];
             acc[category].push(product);
             return acc;
@@ -130,6 +151,7 @@ export async function POST(request: NextRequest) {
       sizes: sizes,
       image: image,
     };
+    console.log(newProduct);
     const product = await Product.create(newProduct);
 
     return NextResponse.json(product, { status: 201 });
