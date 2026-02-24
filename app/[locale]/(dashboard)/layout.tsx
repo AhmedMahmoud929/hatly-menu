@@ -2,9 +2,8 @@
 
 import type React from "react";
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
+import { Link, usePathname } from "@/i18n/routing";
 import {
   BarChart3,
   ClipboardList,
@@ -14,6 +13,7 @@ import {
   Tag,
   Utensils,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -27,42 +27,24 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const router = useRouter();
   const { user, logout, loading } = useAuth();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const t = useTranslations("Dashboard");
 
   const routes = [
-    {
-      href: "/dashboard",
-      label: "Overview",
-      icon: BarChart3,
-      active: pathname === "/dashboard",
-    },
-    {
-      href: "/dashboard/orders",
-      label: "Orders",
-      icon: ClipboardList,
-      active: pathname === "/dashboard/orders",
-    },
-    {
-      href: "/dashboard/categories",
-      label: "Categories",
-      icon: Tag,
-      active: pathname === "/dashboard/categories",
-    },
-    {
-      href: "/dashboard/products",
-      label: "Products",
-      icon: Package,
-      active: pathname === "/dashboard/products",
-    },
-    {
-      href: "/dashboard/settings",
-      label: "Settings",
-      icon: Settings,
-      active: pathname === "/dashboard/settings",
-    },
-  ];
+    { href: "/dashboard", labelKey: "overview" as const, icon: BarChart3 },
+    { href: "/dashboard/orders", labelKey: "orders" as const, icon: ClipboardList },
+    { href: "/dashboard/categories", labelKey: "categories" as const, icon: Tag },
+    { href: "/dashboard/products", labelKey: "products" as const, icon: Package },
+    { href: "/dashboard/settings", labelKey: "settings" as const, icon: Settings },
+  ].map((r) => ({
+    ...r,
+    label: t(r.labelKey),
+    active:
+      r.href === "/dashboard"
+        ? pathname === "/dashboard"
+        : pathname?.startsWith(r.href),
+  }));
 
   // Get user initials for avatar fallback
   const getInitials = () => {
@@ -90,14 +72,14 @@ export default function DashboardLayout({
           <SheetTrigger asChild>
             <Button variant="outline" size="icon" className="lg:hidden">
               <Utensils className="h-5 w-5" />
-              <span className="sr-only">Toggle Menu</span>
+              <span className="sr-only">{t("toggleMenu")}</span>
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-72">
             <div className="flex flex-col space-y-6">
               <div className="flex items-center gap-2 px-2">
                 <Utensils className="h-6 w-6" />
-                <span className="text-lg font-semibold">Hatly Menu</span>
+                <span className="text-lg font-semibold">{t("appName")}</span>
               </div>
               <nav className="grid gap-2 px-2">
                 {routes.map((route) => (
@@ -118,20 +100,20 @@ export default function DashboardLayout({
                 ))}
               </nav>
               <div className="mt-auto px-2">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start text-muted-foreground"
-                  onClick={() => logout()}
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Sign out
-                </Button>
+<Button
+                variant="ghost"
+                className="w-full justify-start text-muted-foreground"
+                onClick={() => logout()}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                {t("signOut")}
+              </Button>
               </div>
             </div>
           </SheetContent>
         </Sheet>
         <div className="flex w-full items-center justify-between">
-          <span className="text-lg font-semibold">Hatly Menu</span>
+          <span className="text-lg font-semibold">{t("appName")}</span>
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <Avatar>
@@ -147,7 +129,7 @@ export default function DashboardLayout({
         <aside className="hidden w-64 flex-col border-r bg-muted/40 lg:flex">
           <div className="flex h-16 items-center gap-2 border-b px-6">
             <Utensils className="h-6 w-6" />
-            <span className="text-lg font-semibold">Hatly Menu</span>
+            <span className="text-lg font-semibold">{t("appName")}</span>
           </div>
           <nav className="flex flex-col gap-2 p-4">
             {routes.map((route) => (
@@ -188,7 +170,7 @@ export default function DashboardLayout({
                 onClick={() => logout()}
               >
                 <LogOut className="h-4 w-4" />
-                <span className="sr-only">Log out</span>
+                <span className="sr-only">{t("logOut")}</span>
               </Button>
             </div>
           </div>

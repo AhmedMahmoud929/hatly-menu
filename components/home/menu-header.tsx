@@ -1,18 +1,14 @@
 "use client";
 import Link from "next/link";
-import { Languages, ShoppingBag } from "lucide-react";
-import { useTheme } from "next-themes";
+import { ShoppingBag } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { LanguageSelector } from "./language-selector";
-import { ThemeToggle } from "../theme-toggle";
 import { useOrder } from "@/contexts/order-context";
 import { useLocale } from "next-intl";
 import { Locale } from "@/i18n/routing";
 import { getLocaleContent } from "@/lib/utils";
 
 export function MenuHeader() {
-  const { theme, setTheme } = useTheme();
   const { order } = useOrder();
   const locale = useLocale() as Locale;
   const anotherLocale = locale === "en" ? "ar" : "en";
@@ -25,17 +21,14 @@ export function MenuHeader() {
         </Link>
 
         <div className="flex items-center gap-2">
-          {/* <LanguageSelector /> */}
           <Link href={`/${anotherLocale}`}>
             <Button variant="outline" className="relative">
-              {/* <Languages className="h-5 w-5" /> */}
               <span>{locale === "ar" ? "English" : "عربي"} </span>
               <span className="sr-only">
                 Change language to {anotherLocale}
               </span>
             </Button>
           </Link>
-          <ThemeToggle variant="outline" className="h-10 w-10" />
           <Link href={"/checkout"}>
             <Button variant="outline" size="icon" className="relative">
               <ShoppingBag className="h-5 w-5" />

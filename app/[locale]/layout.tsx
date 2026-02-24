@@ -2,6 +2,7 @@ import type React from "react";
 import type { Metadata } from "next";
 import { Rubik } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ForceDarkForPublic } from "@/components/force-dark-for-public";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/hooks/use-auth";
 import { NextIntlClientProvider } from "next-intl";
@@ -38,10 +39,11 @@ export default async function RootLayout({
             <OrderProvider>
               <ThemeProvider
                 attribute="class"
-                forcedTheme="dark"
-                enableSystem
+                defaultTheme="dark"
+                enableSystem={false}
                 disableTransitionOnChange
               >
+                <ForceDarkForPublic />
                 {children}
                 <Toaster />
               </ThemeProvider>

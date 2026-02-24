@@ -242,6 +242,25 @@ describe("Categories", () => {
   });
 });
 
+describe("Stats", () => {
+  it("GET /api/stats without auth returns 401", async () => {
+    const res = await apiRequest("GET", "/api/stats");
+    expect(res.status).toBe(401);
+  });
+
+  it("GET /api/stats with auth returns 200", async () => {
+    if (!authCookie) return;
+    const res = await apiRequest("GET", "/api/stats", {
+      headers: { Cookie: authCookie },
+    });
+    expect(res.status).toBe(200);
+    const data = res.data as Record<string, unknown>;
+    expect(data).toHaveProperty("totalOrders");
+    expect(data).toHaveProperty("totalRevenue");
+    expect(data).toHaveProperty("ordersLast7Days");
+  });
+});
+
 describe("Orders", () => {
   it("GET /api/orders without auth returns 401", async () => {
     const res = await apiRequest("GET", "/api/orders");

@@ -1,10 +1,43 @@
 {
-    "Sidebar": {
-        "dashboard": "Dashboard",
-        "home": "Home",
-        "analytics": "Analytics",
-        "users": "Users",
-        "messages": "Messages",
-        "settings": "Settings"
-    }
+  "Sidebar": {
+    "dashboard": "Dashboard",
+    "home": "Home",
+    "analytics": "Analytics",
+    "users": "Users",
+    "messages": "Messages",
+    "settings": "Settings"
+  },
+  "Dashboard": {
+    "appName": "Hatly Menu",
+    "overview": "Overview",
+    "orders": "Orders",
+    "categories": "Categories",
+    "products": "Products",
+    "settings": "Settings",
+    "signOut": "Sign out",
+    "toggleMenu": "Toggle Menu",
+    "logOut": "Log out",
+    "welcomeBack": "Welcome back! Here's an overview of your restaurant.",
+    "ordersStat": "Orders",
+    "categoriesStat": "Categories",
+    "productsStat": "Products",
+    "fromLastMonth": "from last month",
+    "viewAll": "View all",
+    "recentOrders": "Recent Orders",
+    "ordersToday": "You have received 24 orders today.",
+    "viewAllOrders": "View all orders",
+    "quickActions": "Quick Actions",
+    "manageEfficiently": "Manage your restaurant efficiently.",
+    "viewOrders": "View Orders",
+    "manageCategories": "Manage Categories",
+    "manageProducts": "Manage Products",
+    "view": "View",
+    "revenue": "Revenue",
+    "totalRevenue": "Total revenue",
+    "ordersLast7Days": "Orders (last 7 days)",
+    "revenueLast7Days": "Revenue (last 7 days)",
+    "noRecentOrders": "No recent orders.",
+    "order": "Order",
+    "ordersTodayLabel": "orders today"
+  }
 }
