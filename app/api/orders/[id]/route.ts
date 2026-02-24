@@ -4,13 +4,18 @@ import Order from "@/models/Order";
 import { getUserFromToken } from "@/lib/auth-utils";
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await dbConnect();
+    const user = await getUserFromToken();
+    if (!user) {
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    }
 
-    const order = await Order.findById(params.id);
+    await dbConnect();
+    const { id } = await params;
+    const order = await Order.findById(id);
 
     if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
@@ -28,22 +33,19 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Check authentication
     const user = await getUserFromToken();
-
     if (!user) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     await dbConnect();
-
-    const { products, name, table_number, total, status } =
+    const { id } = await params;
+    const { products, customerName, tableNumber, totalPrice, status } =
       await request.json();
 
-    // Validate input
     if ((!products || !products.length) && !status) {
       return NextResponse.json(
         { error: "At least products or status must be provided" },
@@ -51,30 +53,24 @@ export async function PUT(
       );
     }
 
-    // Update order
-    const updateData: any = {};
-
+    const updateData: Record<string, unknown> = {};
     if (products && products.length) {
       updateData.products = products;
     }
-
-    if (name) {
-      updateData.name = name;
+    if (customerName !== undefined) {
+      updateData.customerName = customerName;
     }
-
-    if (table_number) {
-      updateData.table_number = table_number;
+    if (tableNumber !== undefined) {
+      updateData.tableNumber = tableNumber;
     }
-
-    if (total !== undefined) {
-      updateData.total = total;
+    if (totalPrice !== undefined) {
+      updateData.totalPrice = totalPrice;
     }
-
     if (status) {
       updateData.status = status;
     }
 
-    const order = await Order.findByIdAndUpdate(params.id, updateData, {
+    const order = await Order.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true,
     });
@@ -94,20 +90,18 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Check authentication
     const user = await getUserFromToken();
-
     if (!user) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     await dbConnect();
-
-    const order = await Order.findByIdAndDelete(params.id);
+    const { id } = await params;
+    const order = await Order.findByIdAndDelete(id);
 
     if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });

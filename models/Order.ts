@@ -46,7 +46,7 @@ const OrderProductSchema = new Schema<IOrderProduct>({
   ],
   size: {
     type: String,
-    requried: true,
+    required: true,
   },
 });
 

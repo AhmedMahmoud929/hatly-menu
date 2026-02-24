@@ -1,17 +1,16 @@
-import { Suspense, useCallback, useEffect, useState } from "react";
+import { Suspense } from "react";
 import Image from "next/image";
 import { MenuHeader } from "@/components/home/menu-header";
 import { CategoryNav } from "@/components/home/category-nav";
 import { MenuSection } from "@/components/home/menu-section";
 import { CompleteOrderButton } from "@/components/home/complete-order-button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { HotDrinksDummyData, menuItems } from "@/constants";
-import { IProduct } from "@/types";
 import { headers } from "next/headers";
 import { formatCategoryId } from "@/lib/utils";
 import { Locale } from "@/i18n/routing";
+import { IProduct } from "@/types";
 
-export default async function HomePage({
+export default async function LocaleHomePage({
   params,
 }: {
   params: Promise<{ locale: Locale }>;
@@ -22,10 +21,6 @@ export default async function HomePage({
   try {
     const host = (await headers()).get("host");
     const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
-    console.log(
-      "Fetching...",
-      `${protocol}://${host}/api/products?section-format=true`
-    );
     const res = await fetch(
       `${protocol}://${host}/api/products?section-format=true`,
       {

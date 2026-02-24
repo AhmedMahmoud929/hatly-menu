@@ -22,7 +22,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
-    const user = getUserFromToken();
+    const user = await getUserFromToken();
 
     if (!user) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -47,11 +47,11 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(category, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating category:", error);
 
-    // Handle duplicate key error
-    if (error.code === 11000) {
+    // Handle duplicate key error (MongoDB duplicate key)
+    if (typeof error === "object" && error !== null && "code" in error && (error as { code: number }).code === 11000) {
       return NextResponse.json(
         { error: "A category with this name already exists" },
         { status: 409 }

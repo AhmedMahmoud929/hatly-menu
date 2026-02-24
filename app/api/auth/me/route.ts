@@ -1,8 +1,8 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { getUserFromToken } from "@/lib/auth-utils"
 
-export function GET(request: NextRequest) {
-  const user = getUserFromToken(request)
+export async function GET() {
+  const user = await getUserFromToken()
 
   if (!user) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 })

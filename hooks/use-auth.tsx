@@ -30,16 +30,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { toast } = useToast();
   const pathname = usePathname();
-  const isPublic = ["/", "/checkout", "/login", "/register"].includes(pathname);
+  // Only dashboard (admin) routes require login; the rest of the site is public for customers
+  const isDashboardRoute = pathname?.includes("/dashboard") ?? false;
 
+  // Fetch user once on mount (for admin dashboard)
   useEffect(() => {
     getUserFromToken()
       .then((user) => {
         if (user) setUser(user);
-        else if (!isPublic) router.push("/login");
       })
       .finally(() => setLoading(false));
   }, []);
+
+  // Redirect to login only when on a dashboard route and not authenticated
+  useEffect(() => {
+    if (!loading && !user && isDashboardRoute) {
+      router.push("/login");
+    }
+  }, [loading, user, isDashboardRoute, router]);
 
   const login = async (email: string, password: string) => {
     setLoading(true);

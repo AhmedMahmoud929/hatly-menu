@@ -3,11 +3,14 @@ import dbConnect from "@/lib/db-connect"
 import Category from "@/models/Category"
 import { getUserFromToken } from "@/lib/auth-utils"
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     await dbConnect()
-
-    const category = await Category.findById(params.id)
+    const { id } = await params
+    const category = await Category.findById(id)
 
     if (!category) {
       return NextResponse.json({ error: "Category not found" }, { status: 404 })
@@ -20,37 +23,34 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    // Check authentication
-    const user = getUserFromToken(request)
-
+    const user = await getUserFromToken()
     if (!user) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
     }
 
     await dbConnect()
-
+    const { id } = await params
     const { name, image } = await request.json()
 
-    // Validate input
     if (!name || !image) {
       return NextResponse.json({ error: "Name and image are required" }, { status: 400 })
     }
 
-    // Update category
-    const category = await Category.findByIdAndUpdate(params.id, { name, image }, { new: true, runValidators: true })
+    const category = await Category.findByIdAndUpdate(id, { name, image }, { new: true, runValidators: true })
 
     if (!category) {
       return NextResponse.json({ error: "Category not found" }, { status: 404 })
     }
 
     return NextResponse.json(category)
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating category:", error)
-
-    // Handle duplicate key error
-    if (error.code === 11000) {
+    if (typeof error === "object" && error !== null && "code" in error && (error as { code: number }).code === 11000) {
       return NextResponse.json({ error: "A category with this name already exists" }, { status: 409 })
     }
 
@@ -58,18 +58,19 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    // Check authentication
-    const user = getUserFromToken(request)
-
+    const user = await getUserFromToken()
     if (!user) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
     }
 
     await dbConnect()
-
-    const category = await Category.findByIdAndDelete(params.id)
+    const { id } = await params
+    const category = await Category.findByIdAndDelete(id)
 
     if (!category) {
       return NextResponse.json({ error: "Category not found" }, { status: 404 })

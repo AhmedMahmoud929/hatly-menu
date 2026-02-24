@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db-connect";
 import Product, { IProduct } from "@/models/Product";
+import "@/models/Category"; // register model so Product.populate("category") works
 import { getUserFromToken } from "@/lib/auth-utils";
 import { Locale } from "@/i18n/routing";
 import { ILocaleContent } from "@/models";
@@ -8,31 +9,33 @@ import { ILocaleContent } from "@/models";
 export async function GET(req: NextRequest) {
   try {
     await dbConnect();
-    // Access query parameters
     const { searchParams } = new URL(req.url);
-    const acceptLanguage = req.headers.get("Accept-Language") as string;
-    const locale: Locale = ["en", "ar"].includes(acceptLanguage)
-      ? (acceptLanguage as Locale)
-      : "en";
+    const acceptLanguage = req.headers.get("Accept-Language") ?? "";
+    const preferredLocale = acceptLanguage.split(",")[0]?.split("-")[0]?.toLowerCase();
+    const locale: Locale =
+      preferredLocale === "ar" || preferredLocale === "en" ? preferredLocale : "en";
 
-    const isSectionFormat = ["true", "True", "1"].includes(
-      searchParams.get("section-format")!
-    );
+    const sectionParam = searchParams.get("section-format");
+    const isSectionFormat = ["true", "True", "1"].includes(sectionParam ?? "");
 
-    // Fetch products with populated category (only _id and name)
-    const products: (IProduct & {
-      category: { name: ILocaleContent };
-    })[] = await Product.find({})
+    const products = await Product.find({})
       .populate("category", "name")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
-    // Format each product for the correct locale
-    const formattedProducts = products.map((prod) => ({
-      ...prod.toJSON(),
-      name: prod.name[locale],
-      description: prod.description[locale],
-      category: prod.category.name[locale],
-    }));
+    const formattedProducts = products.map((prod: Record<string, unknown>) => {
+      const nameObj = prod.name as ILocaleContent | undefined;
+      const descObj = prod.description as ILocaleContent | undefined;
+      const cat = prod.category as { name?: ILocaleContent } | null | undefined;
+      const categoryName =
+        cat?.name?.[locale] ?? cat?.name?.en ?? cat?.name?.ar ?? "uncategorized";
+      return {
+        ...prod,
+        name: nameObj?.[locale] ?? nameObj?.en ?? nameObj?.ar ?? "",
+        description: descObj?.[locale] ?? descObj?.en ?? descObj?.ar ?? "",
+        category: categoryName,
+      };
+    });
 
     // If section format is requested, group products by category name
     const finalProducts = !isSectionFormat
@@ -50,8 +53,13 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(finalProducts);
   } catch (error) {
     console.error("Error fetching products:", error);
+    const message =
+      error instanceof Error ? error.message : "Failed to fetch products";
     return NextResponse.json(
-      { error: "Failed to fetch products" },
+      {
+        error: "Failed to fetch products",
+        ...(process.env.NODE_ENV === "development" && { detail: message }),
+      },
       { status: 500 }
     );
   }
@@ -151,7 +159,6 @@ export async function POST(request: NextRequest) {
       sizes: sizes,
       image: image,
     };
-    console.log(newProduct);
     const product = await Product.create(newProduct);
 
     return NextResponse.json(product, { status: 201 });

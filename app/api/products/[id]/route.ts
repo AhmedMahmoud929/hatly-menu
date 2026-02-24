@@ -4,13 +4,13 @@ import Product from "@/models/Product";
 import { getUserFromToken } from "@/lib/auth-utils";
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect();
-
-    const product = await Product.findById(params.id);
+    const { id } = await params;
+    const product = await Product.findById(id);
 
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
@@ -28,18 +28,16 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Check authentication
     const user = await getUserFromToken();
-
     if (!user) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     await dbConnect();
-
+    const { id } = await params;
     const {
       name,
       category,
@@ -115,9 +113,8 @@ export async function PUT(
       }
     }
 
-    // Update product
     const product = await Product.findByIdAndUpdate(
-      params.id,
+      id,
       {
         name,
         category,
@@ -148,20 +145,18 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Check authentication
-    const user = getUserFromToken();
-
+    const user = await getUserFromToken();
     if (!user) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     await dbConnect();
-
-    const product = await Product.findByIdAndDelete(params.id);
+    const { id } = await params;
+    const product = await Product.findByIdAndDelete(id);
 
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });

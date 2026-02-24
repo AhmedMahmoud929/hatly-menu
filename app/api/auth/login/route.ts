@@ -28,13 +28,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
     }
 
-    // Create authenticated response
     return createAuthenticatedResponse({
       id: user._id.toString(),
       email: user.email,
       name: user.name,
       role: user.role,
-    }, request)
+    })
 
   } catch (error) {
     console.error("Login error:", error)

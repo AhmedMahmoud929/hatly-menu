@@ -2,9 +2,18 @@
 
 import jwt from "jsonwebtoken"
 import { cookies } from "next/headers"
-import { type NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
+import { getEnv } from "@/lib/env"
 
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key"
+function getJwtSecret(): string {
+  const secret = getEnv().JWT_SECRET
+  if (!secret || secret.length < 32) {
+    throw new Error(
+      "JWT_SECRET must be set and at least 32 characters (e.g. in .env.local). Required for login/register and protected routes."
+    )
+  }
+  return secret
+}
 
 export interface UserJwtPayload {
   id: string
@@ -22,7 +31,7 @@ export async function signToken(user: UserJwtPayload): Promise<string> {
       name: user.name,
       role: user.role,
     },
-    JWT_SECRET,
+    getJwtSecret(),
     { expiresIn: "7d" },
   )
 }
@@ -30,8 +39,8 @@ export async function signToken(user: UserJwtPayload): Promise<string> {
 // Verify JWT token
 export async function verifyToken(token: string): Promise<UserJwtPayload | null> {
   try {
-    return jwt.verify(token, JWT_SECRET) as UserJwtPayload
-  } catch (error) {
+    return jwt.verify(token, getJwtSecret()) as UserJwtPayload
+  } catch {
     return null
   }
 }
@@ -53,7 +62,7 @@ export async function removeTokenCookie() {
 }
 
 // Create authenticated response
-export async function createAuthenticatedResponse(user: UserJwtPayload, request: NextRequest) {
+export async function createAuthenticatedResponse(user: UserJwtPayload) {
   const token = await signToken(user)
   const response = NextResponse.json({
     user: {
@@ -64,12 +73,12 @@ export async function createAuthenticatedResponse(user: UserJwtPayload, request:
     },
   })
 
-  // Set cookie in the response
   response.cookies.set("token", token, {
-    secure: process.env.NODE_ENV !== "development",
+    secure: getEnv().NODE_ENV === "production",
     maxAge: 60 * 60 * 24 * 7, // 1 week
     path: "/",
     httpOnly: true,
+    sameSite: "lax",
   })
 
   return response
